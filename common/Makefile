@@ -56,7 +56,10 @@ info_guardianproject_arti_ArtiJNI.h:
 
 ios: ios-release
 
+ios-debug: export IPHONEOS_DEPLOYMENT_TARGET=15.0
 ios-debug: lipo-ios-debug ios-debug-aarch64-apple-ios
+
+ios-release: export IPHONEOS_DEPLOYMENT_TARGET=15.0
 ios-release: ios-release-aarch64-apple-ios #Simulator is never released, so don't build these targets.
 
 macos: macos-release
