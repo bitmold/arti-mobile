@@ -41,5 +41,5 @@ libc = "0.2.112"
 
 [lib]
 name = "arti_mobile_ex"
-# dylib is for Android, staticlib is for iOS/macOS
-crate-type = ["dylib", "staticlib"]
+# cdylib is for Android, staticlib is for iOS/macOS
+crate-type = ["cdylib", "staticlib"]

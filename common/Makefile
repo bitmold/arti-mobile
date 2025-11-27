@@ -14,14 +14,8 @@ MACOS_TARGETS := \
 	x86_64-apple-darwin
 FILENAME := libarti_mobile_ex.a
 
-export NDK_HOME=${current_dir}cache/ndk/android-ndk-r26b/
+export NDK_HOME=${current_dir}cache/ndk/android-ndk-r26b
 export ANDROID_NDK_HOME=${NDK_HOME}
-
-# https://stackoverflow.com/questions/75943717/error-building-rust-project-for-android-flutter-arm-linux-androideabi-ranlib
-ifeq ($(shell uname), Darwin)
-	export TOOLCHAIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/darwin-x86_64
-	export RANLIB=${TOOLCHAIN}/bin/llvm-ranlib
-endif
 
 all: release
 release: android ios macos
@@ -94,11 +88,10 @@ $(foreach target, $(MACOS_TARGETS), $(eval $(call apple-build-rules,macos,$(targ
 clean:
 	cargo clean
 	cargo uninstall cargo-ndk  # make sure we have a intuitive way to recover from broken builds due to oudated cargo-ndk
-	rm -f arti-mobile.h
-	-rm -rf ../android/arti/src/main/jniLibs
+	rm -rf arti-mobile.h info_guardianproject_arti_ArtiJNI.h jniLibs ../android/arti/src/main/jniLibs
 
 clean-all: clean
-	-rm -rf cache/ndk cache/ndk.zip
+	rm -rf cache
 
 android-install-deps: cache/ndk/android-ndk-r26b cargo-ndk android-targets
 
@@ -109,6 +102,10 @@ macos-install-deps: macos-targets cbindgen
 cache/ndk/android-ndk-r26b: cache/ndk.zip
 	unzip -n -d cache/ndk cache/ndk.zip
 	touch cache/ndk.zip #MacOS' unzip might delete the zip file, so recreate an empty file to calm make.
+
+ifeq ($(shell uname), Darwin)
+	ln -sFf darwin-x86_64 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64
+endif
 
 cache/ndk.zip:
 	mkdir -p cache
