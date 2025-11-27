@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use async_std::task::sleep;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
@@ -7,12 +7,14 @@ use std::{fmt, thread};
 use tor_linkspec::TransportIdError;
 use tracing::{info, warn};
 
-use arti::{dns, exit, reload_cfg, socks, ArtiConfig};
+use arti::{dns, exit, proxy, reload_cfg, ArtiCombinedConfig, ArtiConfig};
+use arti::reload_cfg::ReconfigurableModule;
+use arti_client::config::{CfgPath};
 use arti_client::config::pt::TransportConfigBuilder;
 use arti_client::config::{PtTransportName, TorClientConfigBuilder};
 use arti_client::{TorClient, TorClientConfig};
-use tor_config::{CfgPath, ConfigurationSources, Listen};
-use tor_rtcompat::{BlockOn, PreferredRuntime, Runtime};
+use tor_config::{ConfigurationSources, Listen};
+use tor_rtcompat::{PreferredRuntime, ToplevelBlockOn, ToplevelRuntime};
 
 use tracing_subscriber::fmt::{Layer, Subscriber};
 use tracing_subscriber::layer::SubscriberExt;
@@ -190,12 +192,57 @@ fn _configure_and_run_arti_proxy(
 }
 
 /// Shorthand for a boxed and pinned Future.
-// https://gitlab.torproject.org/tpo/core/arti/-/blob/9f608f9b/crates/arti/src/lib.rs#L124
+// https://gitlab.torproject.org/tpo/core/arti/-/blob/arti-v1.7.0/crates/arti/src/subcommands/proxy.rs#L26
 type PinnedFuture<T> = std::pin::Pin<Box<dyn futures::Future<Output = T>>>;
 
+/// Internal type to represent the Arti application as a `ReconfigurableModule`.
+// https://gitlab.torproject.org/tpo/core/arti/-/blob/arti-v1.7.0/crates/arti/src/reload_cfg.rs#L220
+pub(crate) struct Application {
+    /// The configuration that Arti had at startup.
+    ///
+    /// We use this to check whether the user is asking for any impermissible
+    /// transitions.
+    original_config: ArtiConfig,
+}
+
+impl Application {
+    /// Construct a new `Application` to receive configuration changes for the
+    /// arti application.
+    pub(crate) fn new(cfg: ArtiConfig) -> Self {
+        Self {
+            original_config: cfg,
+        }
+    }
+}
+
+impl ReconfigurableModule for Application {
+    // TODO: This should probably take "how: Reconfigure" as an argument, and
+    // pass it down as appropriate. See issue #1156.
+    #[allow(clippy::cognitive_complexity)]
+    fn reconfigure(&self, new: &ArtiCombinedConfig) -> Result<()> {
+        let original = &self.original_config;
+        let config = &new.0;
+
+        if config.proxy() != original.proxy() {
+            warn!("Can't (yet) reconfigure proxy settings while arti is running.");
+        }
+        if config.logging() != original.logging() {
+            warn!("Can't (yet) reconfigure logging settings while arti is running.");
+        }
+
+        Ok(())
+    }
+}
+
+
+/// Run the main loop of the proxy.
+///
+/// # Panics
+///
+/// Currently, might panic if things go badly enough wrong
 // modified run function based on
-// https://gitlab.torproject.org/tpo/core/arti/-/blob/9f608f9b/crates/arti/src/lib.rs#L180
-async fn _run<R: Runtime>(
+// https://gitlab.torproject.org/tpo/core/arti/-/blob/arti-v1.7.0/crates/arti/src/subcommands/proxy.rs#L108
+async fn _run<R: ToplevelRuntime>(
     runtime: R,
     socks_listen: Listen,
     dns_listen: Listen,
@@ -223,29 +270,11 @@ async fn _run<R: Runtime>(
     use arti_client::BootstrapBehavior::OnDemand;
     use futures::FutureExt;
 
-    // TODO: disabled rpc for now
-    // #[cfg(feature = "rpc")]
-    // let rpc_path = {
-    //     if let Some(path) = &arti_config.rpc().rpc_listen {
-    //         let path = path.path()?;
-    //         let parent = path
-    //             .parent()
-    //             .ok_or(anyhow::anyhow!("No parent directory for rpc_listen path?"))?;
-    //         client_config
-    //             .fs_mistrust()
-    //             .verifier()
-    //             .make_secure_dir(parent)?;
-    //         // It's just a unix thing; if we leave this sitting around, binding to it won't
-    //         // work right.  There is probably a better solution.
-    //         if path.exists() {
-    //             std::fs::remove_file(&path)?;
-    //         }
-
-    //         Some(path)
-    //     } else {
-    //         None
-    //     }
-    // };
+    // // TODO RPC: We may instead want to provide a way to get these items out of TorClient.
+    // #[allow(unused)]
+    // let fs_mistrust = client_config.fs_mistrust().clone();
+    // #[allow(unused)]
+    // let path_resolver: CfgPathResolver = AsRef::<CfgPathResolver>::as_ref(&client_config).clone();
 
     let client_builder = TorClient::with_runtime(runtime.clone())
         .config(client_config)
@@ -255,16 +284,19 @@ async fn _run<R: Runtime>(
     #[allow(unused_mut)]
     let mut reconfigurable_modules: Vec<Arc<dyn reload_cfg::ReconfigurableModule>> = vec![
         Arc::new(client.clone()),
-        // Arc::new(reload_cfg::Application::new(arti_config.clone())),
+        Arc::new(Application::new(arti_config.clone())),
     ];
 
-    // TODO: disabled onion service support for now
-    // #[cfg(feature = "onion-service-service")]
-    // {
-    //     let onion_services =
-    //         onion_proxy::ProxySet::launch_new(&client, arti_config.onion_services.clone())?;
-    //     reconfigurable_modules.push(Arc::new(onion_services));
-    // }
+    // cfg_if::cfg_if! {
+    //     if #[cfg(feature = "onion-service-service")] {
+    //         let onion_services =
+    //             onion_proxy::ProxySet::launch_new(&client, arti_config.onion_services.clone())?;
+    //         let launched_onion_svc = !onion_services.is_empty();
+    //         reconfigurable_modules.push(Arc::new(onion_services));
+    //     } else {
+            let launched_onion_svc = false;
+    //     }
+    // };
 
     // We weak references here to prevent the thread spawned by watch_for_config_changes from
     // keeping these modules alive after this function exits.
@@ -279,34 +311,33 @@ async fn _run<R: Runtime>(
         weak_modules,
     )?;
 
-    // #[cfg(all(feature = "rpc", feature = "tokio"))]
-    // let rpc_mgr = {
-    //     // TODO RPC This code doesn't really belong here; it's just an example.
-    //     if let Some(listen_path) = rpc_path {
-    //         // TODO Conceivably this listener belongs on a renamed "proxy" list.
-    //         Some(rpc::launch_rpc_listener(
+    // cfg_if::cfg_if! {
+    //     if #[cfg(feature = "rpc")] {
+    //         let rpc_data = rpc::launch_rpc_mgr(
     //             &runtime,
-    //             listen_path,
+    //             &arti_config.rpc,
+    //             &path_resolver,
+    //             &fs_mistrust,
     //             client.clone(),
-    //         )?)
+    //         )
+    //         .await?;
     //     } else {
-    //         None
+            let rpc_data = None;
     //     }
-    // };
+    // }
 
     let mut proxy: Vec<PinnedFuture<(Result<()>, &str)>> = Vec::new();
     if !socks_listen.is_empty() {
         let runtime = runtime.clone();
         let client = client.isolated_client();
+        let socks_listen = socks_listen.clone();
         proxy.push(Box::pin(async move {
-            let res = socks::run_socks_proxy(
-                runtime,
-                client,
-                socks_listen,
-                // #[cfg(all(feature = "rpc", feature = "tokio"))]
-                // rpc_mgr,
-            )
-            .await;
+            let res = proxy::run_proxy(runtime, client, socks_listen, rpc_data).await;
+            // #[cfg(feature = "http-connect")]
+            // let listener_type = "SOCKS+HTTP";
+            // #[cfg(not(feature = "http-connect"))]
+            // let listener_type = "SOCKS";
+
             (res, "SOCKS")
         }));
     }
@@ -321,11 +352,27 @@ async fn _run<R: Runtime>(
         }));
     }
 
+    // #[cfg(not(feature = "dns-proxy"))]
+    // if !dns_listen.is_empty() {
+    //     warn!(
+    //         "Tried to specify a DNS proxy address, but Arti was built without dns-proxy support."
+    //     );
+    //     return Ok(());
+    // }
+
     if proxy.is_empty() {
-        warn!("No proxy port set; specify -p PORT (for `socks_port`) or -d PORT (for `dns_port`). Alternatively, use the `socks_port` or `dns_port` configuration option.");
-        return Ok(());
+        if !launched_onion_svc {
+            // TODO: rename "socks_port" to "proxy_port", preserving compat, once http-connect is stable.
+            warn!(
+                "No proxy port set; specify -p PORT (for `socks_port`) or -d PORT (for `dns_port`). Alternatively, use the `socks_port` or `dns_port` configuration option."
+            );
+            return Ok(());
+        } else {
+            // Push a dummy future to appease future::select_all,
+            // which expects a non-empty list
+            proxy.push(Box::pin(futures::future::pending()));
+        }
     }
-    use anyhow::Context;
 
     let proxy = futures::future::select_all(proxy).map(|(finished, _index, _others)| finished);
     futures::select!(
@@ -335,7 +382,11 @@ async fn _run<R: Runtime>(
             => r.0.context(format!("{} proxy failure", r.1)),
         r = async {
             client.bootstrap().await?;
-            info!("Sufficiently bootstrapped; system SOCKS now functional.");
+            if !socks_listen.is_empty() {
+                info!("Sufficiently bootstrapped; proxy now functional.");
+            } else {
+                info!("Sufficiently bootstrapped.");
+            }
 
             if let Ok(mut state) = STATE.lock(){
                 *state = AMExState::Running;
@@ -352,8 +403,7 @@ async fn _run<R: Runtime>(
                 }
             }
 
-            let r: Result<(), anyhow::Error> = Result::Ok(());
-            r
+            futures::future::pending::<Result<()>>().await
         }.fuse()
             => r.context("bootstrap"),
     )?;
@@ -389,7 +439,7 @@ where
 {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         (self.func)(buf);
-        return Ok(buf.len());
+        Ok(buf.len())
     }
 
     fn flush(&mut self) -> std::io::Result<()> {

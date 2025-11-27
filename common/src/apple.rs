@@ -10,6 +10,8 @@ type LoggingCallback = extern "C" fn(*const c_char);
 pub extern "C" fn start_arti(
     state_dir: *const c_char,
     cache_dir: *const c_char,
+    obfs4_port: c_int,
+    snowflake_port: c_int,
     obfs4proxy_path: *const c_char,
     bridge_line: *const c_char,
     socks_port: c_int,
@@ -34,8 +36,8 @@ pub extern "C" fn start_arti(
     let result = match start_arti_proxy(
         &cache_dir,
         &state_dir,
-        0, // obfs4 port
-        0, // snowflake port
+        obfs4_port as u16,
+        snowflake_port as u16,
         obfs4proxy_path,
         bridge_line,
         socks_port as u16,
