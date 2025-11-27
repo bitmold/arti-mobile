@@ -1,4 +1,4 @@
-use crate::start_arti_proxy;
+use crate::{start_arti_proxy, stop_arti_proxy};
 
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_int};
@@ -51,3 +51,9 @@ pub extern "C" fn start_arti(
 
     CString::new(result).unwrap().into_raw()
 }
+
+#[no_mangle]
+pub extern "C" fn stop_arti() {
+    stop_arti_proxy();
+}
+
