@@ -58,7 +58,10 @@ ios-release: ios-release-aarch64-apple-ios #Simulator is never released, so don'
 
 macos: macos-release
 
+macos-debug: export MACOSX_DEPLOYMENT_TARGET=11.0
 macos-debug: lipo-macos-debug
+
+macos-release: export MACOSX_DEPLOYMENT_TARGET=11.0
 macos-release: lipo-macos-release
 
 arti-mobile.h:
