@@ -14,7 +14,7 @@ MACOS_TARGETS := \
 	x86_64-apple-darwin
 FILENAME := libarti_mobile_ex.a
 
-export NDK_HOME=${current_dir}cache/ndk/android-ndk-r26b
+export NDK_HOME=${current_dir}cache/ndk/android-ndk-r27d
 export ANDROID_NDK_HOME=${NDK_HOME}
 
 all: release
@@ -96,29 +96,30 @@ clean:
 clean-all: clean
 	rm -rf cache
 
-android-install-deps: cache/ndk/android-ndk-r26b cargo-ndk android-targets
+android-install-deps: cache/ndk/android-ndk-r27d cargo-ndk android-targets
 
 ios-install-deps: ios-targets cbindgen
 
 macos-install-deps: macos-targets cbindgen
 
-cache/ndk/android-ndk-r26b: cache/ndk.zip
+cache/ndk/android-ndk-r27d: cache/ndk.zip
 	unzip -n -d cache/ndk cache/ndk.zip
 	touch cache/ndk.zip #MacOS' unzip might delete the zip file, so recreate an empty file to calm make.
 
 ifeq ($(shell uname), Darwin)
 	ln -sFf darwin-x86_64 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64
+	ln -sFf 18 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/darwin-x86_64/lib/clang/17
 endif
 
 cache/ndk.zip:
 	mkdir -p cache
 
 ifeq ($(OS),Windows_NT)
-	wget https://dl.google.com/android/repository/android-ndk-r26b-windows.zip -O $@
+	wget https://dl.google.com/android/repository/android-ndk-r27d-windows.zip -O $@
 else ifeq ($(shell uname), Linux)
-	wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip -O $@
+	wget https://dl.google.com/android/repository/android-ndk-r27d-linux.zip -O $@
 else ifeq ($(shell uname), Darwin)
-	wget https://dl.google.com/android/repository/android-ndk-r26b-darwin.zip -O $@
+	wget https://dl.google.com/android/repository/android-ndk-r27d-darwin.zip -O $@
 else
 	@echo "No NDK found for your system, please download it by yourself."
 	@false
