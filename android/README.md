@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation("info.guardianproject:arti-mobile-ex:1.1.0-local-release")
+    implementation("org.torproject:arti-mobile:1.7.0")
 }
 
 

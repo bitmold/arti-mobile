@@ -7,7 +7,7 @@ plugins {
 
 
 android {
-    namespace 'info.guardianproject.arti'
+    namespace 'org.torproject.arti'
     compileSdk 34
 
     defaultConfig {

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2022 Michael Pöhn <michael@poehn.at>
 // SPDX-License-Identifier: MIT
 
-package info.guardianproject.sample.arti;
+package org.torproject.sample.arti;
 
 import android.app.Application;
 import android.content.Context;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import IPtProxy.IPtProxy;
 
-import info.guardianproject.arti.ArtiProxy;
+import org.torproject.arti.ArtiProxy;
 
 public class App extends Application {
 

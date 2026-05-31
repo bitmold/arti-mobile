@@ -1,4 +1,4 @@
-package info.guardianproject.arti;
+package org.torproject.arti;
 
 import android.content.Context;
 

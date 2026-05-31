@@ -37,11 +37,11 @@ android-release-arm64: android-install-deps
 android-release-x86_64: android-install-deps
 	RUSTFLAGS='-C link-arg=-s' cargo ndk -t x86_64 -o ../android/arti/src/main/jniLibs build --release
 
-info_guardianproject_arti_ArtiJNI.h:
+org_torproject_arti_ArtiJNI.h:
 	javac \
 		-h . \
 		-classpath ../android/arti/src/main/java/ \
-		../android/arti/src/main/java/info/guardianproject/arti/ArtiJNI.java
+		../android/arti/src/main/java/org/torproject/arti/ArtiJNI.java
 	find ../android/arti/src/main/java -name "*.class" | xargs rm
 
 ios: ios-release
@@ -87,7 +87,7 @@ $(foreach target, $(MACOS_TARGETS), $(eval $(call apple-build-rules,macos,$(targ
 clean:
 	cargo clean
 	cargo uninstall cargo-ndk  # make sure we have a intuitive way to recover from broken builds due to oudated cargo-ndk
-	rm -rf arti-mobile.h info_guardianproject_arti_ArtiJNI.h jniLibs ../android/arti/src/main/jniLibs
+	rm -rf arti-mobile.h org_torproject_arti_ArtiJNI.h jniLibs ../android/arti/src/main/jniLibs
 
 clean-all: clean
 	rm -rf cache

@@ -1,4 +1,4 @@
-package info.guardianproject.arti;
+package org.torproject.arti;
 
 /**
  * It's discouraged to use this directly. Use ArtiProxy instead.

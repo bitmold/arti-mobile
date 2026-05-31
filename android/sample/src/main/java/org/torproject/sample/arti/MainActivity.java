@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2022 Michael Pöhn <michael@poehn.at>
 // SPDX-License-Identifier: MIT
 
-package info.guardianproject.sample.arti;
+package org.torproject.sample.arti;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;

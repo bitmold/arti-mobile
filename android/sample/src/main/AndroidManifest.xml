@@ -14,10 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Artiandroid"
-        android:name="info.guardianproject.sample.arti.App"
+        android:name="org.torproject.sample.arti.App"
         tools:targetApi="31">
         <activity
-            android:name="info.guardianproject.sample.arti.MainActivity"
+            android:name="org.torproject.sample.arti.MainActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="true">
             <intent-filter>

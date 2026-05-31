@@ -3,4 +3,4 @@ target
 ndk
 ndk.zip
 arti-mobile.h
-info_guardianproject_arti_ArtiJNI.h
+org_torproject_arti_ArtiJNI.h

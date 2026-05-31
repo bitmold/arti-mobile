@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2022 Michael Pöhn <michael@poehn.at>
 // SPDX-License-Identifier: MIT
 
-package info.guardianproject.arti;
+package org.torproject.arti;
 
 import org.junit.Test;
 

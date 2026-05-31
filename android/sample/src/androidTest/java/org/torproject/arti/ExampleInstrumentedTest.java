@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2022 Michael Pöhn <michael@poehn.at>
 // SPDX-License-Identifier: MIT
 
-package info.guardianproject.arti;
+package org.torproject.arti;
 
 import android.content.Context;
 
@@ -24,6 +24,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("info.guardianproject.arti", appContext.getPackageName());
+        assertEquals("org.torproject.arti", appContext.getPackageName());
     }
 }

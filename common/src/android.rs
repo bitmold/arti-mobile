@@ -9,7 +9,7 @@ use jni::{Executor, JNIEnv};
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_guardianproject_arti_ArtiJNI_stopArtiProxyJNI<'local>(
+pub extern "system" fn Java_org_torproject_arti_ArtiJNI_stopArtiProxyJNI<'local>(
     _env: JNIEnv<'local>,
     _class: JClass<'local>,
 ) {
@@ -19,7 +19,7 @@ pub extern "system" fn Java_info_guardianproject_arti_ArtiJNI_stopArtiProxyJNI<'
 /// Create a static method myMethod on class net.example.MyClass
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_guardianproject_arti_ArtiJNI_startArtiProxyJNI<'local>(
+pub extern "system" fn Java_org_torproject_arti_ArtiJNI_startArtiProxyJNI<'local>(
     mut env: JNIEnv<'local>,
     _class: JClass<'local>,
     cacheDir: JString<'local>,
