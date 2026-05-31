@@ -14,9 +14,9 @@ task clean(type: Delete) {
 }
 
 ext {
-    versionName = "1.2.3"
-    LIBRARY_GROUP = "info.guardianproject"
-    LIBRARY_ARTIFACT_ID = "arti-mobile-ex"
+    versionName = "1.7.0"
+    LIBRARY_GROUP = "org.torproject"
+    LIBRARY_ARTIFACT_ID = "arti-mobile"
     LIBRARY_VERSION_NAME = versionName
     LIBRARY_URL = "https://gitlab.com/guardianproject/arti-mobile-ex"
     LIBRARY_GIT_URL = "https://gitlab.com/guardianproject/arti-mobile-ex.git"
