@@ -23,16 +23,13 @@ debug: android-debug ios-debug macos-debug
 android: android-release
 
 android-debug: android-install-deps
-	cargo ndk -t armeabi-v7a -t arm64-v8a -t x86 -t x86_64 -o ../android/arti/src/main/jniLibs build
-
-android-debug-x86: android-install-deps
-	cargo ndk -t x86 -o ../android/arti/src/main/jniLibs build
+	cargo ndk -t armeabi-v7a -t arm64-v8a -t x86_64 -o ../android/arti/src/main/jniLibs build
 
 android-debug-x86_64: android-install-deps
 	cargo ndk -t x86_64 -o ../android/arti/src/main/jniLibs build
 
 android-release: android-install-deps
-	RUSTFLAGS='-C link-arg=-s' cargo ndk -t armeabi-v7a -t arm64-v8a -t x86 -t x86_64 -o ../android/arti/src/main/jniLibs build --release
+	RUSTFLAGS='-C link-arg=-s' cargo ndk -t armeabi-v7a -t arm64-v8a -t x86_64 -o ../android/arti/src/main/jniLibs build --release
 
 android-release-arm64: android-install-deps
 	RUSTFLAGS='-C link-arg=-s' cargo ndk -t arm64-v8a -o ../android/arti/src/main/jniLibs build --release
@@ -95,30 +92,34 @@ clean:
 clean-all: clean
 	rm -rf cache
 
-android-install-deps: cache/ndk/android-ndk-r27d cargo-ndk android-targets
+android-install-deps: cache/ndk/android-ndk-r28c cargo-ndk android-targets
 
 ios-install-deps: ios-targets cbindgen
 
 macos-install-deps: macos-targets cbindgen
 
-cache/ndk/android-ndk-r27d: cache/ndk.zip
+cache/ndk/android-ndk-r28c: cache/ndk.zip
 	unzip -n -d cache/ndk cache/ndk.zip
 	touch cache/ndk.zip #MacOS' unzip might delete the zip file, so recreate an empty file to calm make.
 
+# rustc looks for the compiler-rt builtins under lib/clang/17, but NDK r28c
+# ships clang 19; bridge the version dir so -lclang_rt.builtins-* resolves.
 ifeq ($(shell uname), Darwin)
 	ln -sFf darwin-x86_64 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64
-	ln -sFf 18 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/darwin-x86_64/lib/clang/17
+	ln -sFf 19 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/darwin-x86_64/lib/clang/17
+else
+	ln -sFf 19 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17
 endif
 
 cache/ndk.zip:
 	mkdir -p cache
 
 ifeq ($(OS),Windows_NT)
-	wget https://dl.google.com/android/repository/android-ndk-r27d-windows.zip -O $@
+	wget https://dl.google.com/android/repository/android-ndk-r28c-windows.zip -O $@
 else ifeq ($(shell uname), Linux)
-	wget https://dl.google.com/android/repository/android-ndk-r27d-linux.zip -O $@
+	wget https://dl.google.com/android/repository/android-ndk-r28c-linux.zip -O $@
 else ifeq ($(shell uname), Darwin)
-	wget https://dl.google.com/android/repository/android-ndk-r27d-darwin.zip -O $@
+	wget https://dl.google.com/android/repository/android-ndk-r28c-darwin.zip -O $@
 else
 	@echo "No NDK found for your system, please download it by yourself."
 	@false
