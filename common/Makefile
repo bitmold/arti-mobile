@@ -108,7 +108,7 @@ ifeq ($(shell uname), Darwin)
 	ln -sFf darwin-x86_64 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64
 	ln -sFf 19 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/darwin-x86_64/lib/clang/17
 else
-	ln -sFf 19 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17
+	ln -sfn 19 ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/17
 endif
 
 cache/ndk.zip:
