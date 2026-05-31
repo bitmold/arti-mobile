@@ -3,7 +3,6 @@ rust-installed-targets := $(shell rustup target list --installed)
 ANDROID_TARGETS := \
 	armv7-linux-androideabi \
 	aarch64-linux-android \
-	i686-linux-android \
 	x86_64-linux-android
 IOS_TARGETS := \
 	aarch64-apple-ios \
