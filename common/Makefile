@@ -14,7 +14,7 @@ MACOS_TARGETS := \
 	x86_64-apple-darwin
 FILENAME := libarti_mobile_ex.a
 
-export NDK_HOME=${current_dir}cache/ndk/android-ndk-r27d
+export NDK_HOME=${current_dir}cache/ndk/android-ndk-r28c
 export ANDROID_NDK_HOME=${NDK_HOME}
 
 all: release
