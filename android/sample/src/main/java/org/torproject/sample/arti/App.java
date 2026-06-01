@@ -32,7 +32,6 @@ public class App extends Application {
 //        Log.d("###", String.format("snowflake port: %d", IPtProxy.snowflakePort()));
 //        Log.d("###", String.format("snowflake version: %s", IPtProxy.snowflakeVersion()));
 
-        IPtProxy.setStateLocation(new File(getCacheDir(), "pt_state").getAbsolutePath());
         // run obfs4/lyrebird client
 //        IPtProxy.startLyrebird("DEBUG", false, false, null);
 
@@ -60,18 +59,19 @@ public class App extends Application {
 
     public void connectTorDirect() {
         mArtiProxy = ArtiProxy.Builder(this)
-                // .setUnmanagedSnowflakeClientPort((int) IPtProxy.snowflakePort())
-//                .setSnowflakePort((int) IPtProxy.snowflakePort())
                 .setLogListener((log) -> {
                     Log.e("artilog", log);
                     App.logOutput(getApplicationContext(), log + "\n");
                 })
+                .setWrapWebView(true)
                 .build();
         mArtiProxy.start();
 
     }
 
     public void connectWithLyrebird(int port, List<String> bridgeLines) {
+        IPtProxy.setStateLocation(new File(getCacheDir(), "pt_state").getAbsolutePath());
+
         IPtProxy.startLyrebird("DEBUG", false, false, null);
 //      sample bridge lines:
 //      "obfs4 69.235.46.22:30913 F79914011EB368C94E58F6CCF8A55A92EFD5F496 cert=ZKLm+4biqgPIf/g1s3slv8jLSzIzLSXAHFOfBLqtrNvnTM6LVbxe/K8e8jJKiXwOpvkoDw iat-mode=0",
@@ -89,6 +89,8 @@ public class App extends Application {
     }
     public void connectWithSnowflake(String stunServers, String target, String front,
                                      List<String> bridgeLines) {
+        IPtProxy.setStateLocation(new File(getCacheDir(), "pt_state").getAbsolutePath());
+
         IPtProxy.startSnowflake(
                 stunServers, // String ice,
                 target, //String url,
