@@ -8,36 +8,20 @@ repositories {
 }
 
 dependencies {
-    implementation("org.torproject:arti-mobile:1.7.0")
+    implementation("org.torproject:arti-mobile:1.7.0.1")
 }
 
 
 Sample use:
 
-	//show arti logs into Android logcat
-	Arti.initLogging(); 
+  	var artiProxy = ArtiProxy.Builder(this)
+                .setLogListener((log) -> {
+                    Log.d("artilog", log);
+                    App.logOutput(getApplicationContext(), log + "\n");
+                })
+                .setWrapWebView(true)
+                .build();
+        mArtiProxy.start();
+        var socksPort = mArtiProxy.getSocksPort();
 
-	//enable localhost:9150 socks proxy for use with WebView and other proxy capable communication
-	ArtiSocksProxy.start(this); 
-
- 	//set SOCKS proxy on WebView
-  	String proxyHost = "socks://127.0.0.1:9150";
-
-        ProxyConfig proxyConfig = new ProxyConfig.Builder()
-                .addProxyRule(proxyHost) //http proxy for tor
-                .addDirect().build();
-
-        ProxyController.getInstance().setProxyOverride(proxyConfig, new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                //do nothing
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-        ProxyController.getInstance().setProxyOverride(proxyConfig, command -> {
-            //do nothing
-        }, () -> {
-            }
-        });
 

@@ -67,6 +67,8 @@ public class App extends Application {
                 .build();
         mArtiProxy.start();
 
+        var socksProt = mArtiProxy.getSocksPort();
+
     }
 
     public void connectWithLyrebird(int port, List<String> bridgeLines) {
