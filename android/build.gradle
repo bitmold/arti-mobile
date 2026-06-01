@@ -14,7 +14,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    versionName = "1.7.0"
+    versionName = "1.7.0.1"
     LIBRARY_GROUP = "org.torproject"
     LIBRARY_ARTIFACT_ID = "arti-mobile"
     LIBRARY_VERSION_NAME = versionName
