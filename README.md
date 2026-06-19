@@ -20,8 +20,8 @@ For more explanations on what it is doing. You should read Arti documentation [f
 
 ## Quick Integration
 
-- View the SAMPLE project in the "Android" folder, and find additional Android integration guidance on the [Onion Mobile Devsite](https://guide.onionmobile.dev/tor-on-android/arti-mobile-on-android)
-- View the SAMPLE proejct in the "iOS" folder, and find additional iOS integration guidance on the [Onion Mobile Devsite](https://guide.onionmobile.dev/tor-on-ios/arti-and-onionmasq-on-ios)
+- View the [Android sample project](-/tree/main/android?ref_type=heads) in the "Android" folder, and find additional Android integration guidance on the [Onion Mobile Devsite](https://guide.onionmobile.dev/tor-on-android/arti-mobile-on-android)
+- View the [iOS sample project](-/tree/main/ios?ref_type=heads) in the "iOS" folder, and find additional iOS integration guidance on the [Onion Mobile Devsite](https://guide.onionmobile.dev/tor-on-ios/arti-and-onionmasq-on-ios)
 
 Android library for Arti with JNI interface
 
