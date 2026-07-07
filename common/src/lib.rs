@@ -7,10 +7,10 @@ use std::{fmt, thread};
 use tor_linkspec::TransportIdError;
 use tracing::{info, warn};
 
-use arti::{dns, exit, proxy, reload_cfg, ArtiCombinedConfig, ArtiConfig};
 use arti::reload_cfg::ReconfigurableModule;
-use arti_client::config::{CfgPath};
+use arti::{dns, exit, proxy, reload_cfg, ArtiCombinedConfig, ArtiConfig};
 use arti_client::config::pt::TransportConfigBuilder;
+use arti_client::config::CfgPath;
 use arti_client::config::{PtTransportName, TorClientConfigBuilder};
 use arti_client::{TorClient, TorClientConfig};
 use tor_config::{ConfigurationSources, Listen};
@@ -234,7 +234,6 @@ impl ReconfigurableModule for Application {
     }
 }
 
-
 /// Run the main loop of the proxy.
 ///
 /// # Panics
@@ -294,7 +293,7 @@ async fn _run<R: ToplevelRuntime>(
     //         let launched_onion_svc = !onion_services.is_empty();
     //         reconfigurable_modules.push(Arc::new(onion_services));
     //     } else {
-            let launched_onion_svc = false;
+    let launched_onion_svc = false;
     //     }
     // };
 
@@ -322,7 +321,7 @@ async fn _run<R: ToplevelRuntime>(
     //         )
     //         .await?;
     //     } else {
-            let rpc_data = None;
+    let rpc_data = None;
     //     }
     // }
 
