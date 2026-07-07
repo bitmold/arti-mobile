@@ -3,6 +3,7 @@ stages:
   - native
   - test
   - package
+  - release
   - publish
 
 workflow:
@@ -16,6 +17,7 @@ variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.cache/gradle"
   RUSTUP_HOME: "$CI_PROJECT_DIR/.cache/rustup"
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2048m"
+  TRUSTED_RELEASE_GPG_KEYS_FILE: "ci/trusted-release-gpg-keys.asc"
 
 .rust_cache: &rust_cache
   key:
@@ -118,6 +120,46 @@ android:package:
       - android/arti/build/outputs/aar/*.aar
       - android/sample/build/outputs/apk/debug/*.apk
 
+release:verify_tag:
+  stage: release
+  image: containers.torproject.org/tpo/tpa/base-images/debian:stable
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  variables:
+    GIT_DEPTH: "0"
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends ca-certificates git gnupg
+  script:
+    - |
+      if [ ! -s "$TRUSTED_RELEASE_GPG_KEYS_FILE" ]; then
+        echo "Trusted release signing keys file is missing or empty: $TRUSTED_RELEASE_GPG_KEYS_FILE"
+        exit 1
+      fi
+    - install -d -m 700 "$CI_PROJECT_DIR/.gnupg"
+    - export GNUPGHOME="$CI_PROJECT_DIR/.gnupg"
+    - gpg --batch --import "$TRUSTED_RELEASE_GPG_KEYS_FILE"
+    - |
+      trusted_key_count="$(gpg --batch --with-colons --list-keys | sed -n 's/^fpr:.*/x/p' | wc -l)"
+      if [ "$trusted_key_count" -eq 0 ]; then
+        echo "No valid trusted release public keys were imported from $TRUSTED_RELEASE_GPG_KEYS_FILE"
+        exit 1
+      fi
+    - gpg --batch --list-keys
+    - git fetch --force origin "refs/tags/${CI_COMMIT_TAG}:refs/tags/${CI_COMMIT_TAG}"
+    - git fetch --force origin "${CI_DEFAULT_BRANCH}:refs/remotes/origin/${CI_DEFAULT_BRANCH}"
+    - |
+      if ! git merge-base --is-ancestor "$CI_COMMIT_SHA" "origin/${CI_DEFAULT_BRANCH}"; then
+        echo "Release tag '$CI_COMMIT_TAG' must point to a commit contained in ${CI_DEFAULT_BRANCH}."
+        exit 1
+      fi
+    - |
+      if [ "$(git cat-file -t "$CI_COMMIT_TAG" 2>/dev/null)" != "tag" ]; then
+        echo "Release tag '$CI_COMMIT_TAG' must be an annotated signed tag, not a lightweight tag."
+        exit 1
+      fi
+    - git verify-tag -v "$CI_COMMIT_TAG"
+
 publish:maven:
   stage: publish
   extends: .android_job
@@ -126,6 +168,8 @@ publish:maven:
       artifacts: true
     - job: android:test
     - job: android:package
+    - job: release:verify_tag
+      optional: true
   cache: *gradle_cache_pull
   script:
     - ./gradlew --no-daemon :arti:publishLibraryReleasePublicationToGitLabRepository
