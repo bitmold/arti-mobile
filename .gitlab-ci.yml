@@ -23,15 +23,19 @@ variables:
       - common/Cargo.lock
   paths:
     - .cache/cargo/registry
-    - .cache/cargo/git
-    - .cache/rustup
-    - common/target
+
+.rust_cache_pull: &rust_cache_pull
+  <<: *rust_cache
+  policy: pull
 
 .gradle_cache: &gradle_cache
   key: "gradle-${CI_COMMIT_REF_SLUG}"
   paths:
-    - .cache/gradle/caches
     - .cache/gradle/wrapper
+
+.gradle_cache_pull: &gradle_cache_pull
+  <<: *gradle_cache
+  policy: pull
 
 .android_job:
   image: ghcr.io/cirruslabs/android-sdk:35
@@ -61,7 +65,7 @@ rust:check:
 android:native:
   stage: native
   image: ghcr.io/cirruslabs/android-sdk:35
-  cache: *rust_cache
+  cache: *rust_cache_pull
   before_script:
     - apt-get update
     - apt-get install -y --no-install-recommends build-essential curl unzip wget ca-certificates
@@ -105,7 +109,7 @@ android:package:
   needs:
     - job: android:native
       artifacts: true
-  cache: *gradle_cache
+  cache: *gradle_cache_pull
   script:
     - ./gradlew --no-daemon :arti:assembleRelease :sample:assembleDebug
   artifacts:
@@ -122,7 +126,7 @@ publish:maven:
       artifacts: true
     - job: android:test
     - job: android:package
-  cache: *gradle_cache
+  cache: *gradle_cache_pull
   script:
     - ./gradlew --no-daemon :arti:publishLibraryReleasePublicationToGitLabRepository
   rules:
