@@ -80,7 +80,7 @@ where
         dns_port,
     );
 
-    Ok("arti-mobile-ex proxy init".to_owned())
+    Ok("arti-mobile proxy init".to_owned())
 }
 
 fn _init_log_subscriber<F>(log_fn: F)

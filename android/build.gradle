@@ -18,8 +18,8 @@ ext {
     LIBRARY_GROUP = "org.torproject"
     LIBRARY_ARTIFACT_ID = "arti-mobile"
     LIBRARY_VERSION_NAME = versionName
-    LIBRARY_URL = "https://gitlab.com/guardianproject/arti-mobile-ex"
-    LIBRARY_GIT_URL = "https://gitlab.com/guardianproject/arti-mobile-ex.git"
+    LIBRARY_URL = "https://gitlab.com/guardianproject/tormobile/arti-mobile"
+    LIBRARY_GIT_URL = "https://gitlab.com/guardianproject/tormobile/arti-mobile.git"
     OSS_SIGNING_KEY_ID = "nathan@guardianproject.info"
     OSS_SIGNING_KEY = "0x123456"
 }

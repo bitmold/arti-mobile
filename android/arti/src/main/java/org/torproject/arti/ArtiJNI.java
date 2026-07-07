@@ -6,7 +6,7 @@ package org.torproject.arti;
 class ArtiJNI {
 
     static {
-        System.loadLibrary("arti_mobile_ex");
+        System.loadLibrary("arti_mobile");
     }
 
     static native String startArtiProxyJNI(

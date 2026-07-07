@@ -1,5 +1,5 @@
 [package]
-name = "arti-mobile-ex"
+name = "arti-mobile"
 version = "1.7.0"
 edition = "2018"
 
@@ -38,6 +38,6 @@ libc = "0.2.112"
 
 
 [lib]
-name = "arti_mobile_ex"
+name = "arti_mobile"
 # cdylib is for Android, staticlib is for iOS/macOS
 crate-type = ["cdylib", "staticlib"]
