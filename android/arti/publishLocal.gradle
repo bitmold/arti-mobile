@@ -1,6 +1,9 @@
 apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
 
+import org.gradle.api.credentials.HttpHeaderCredentials
+import org.gradle.authentication.http.HttpHeaderAuthentication
+
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     archiveClassifier.set("sources")
@@ -41,6 +44,24 @@ project.afterEvaluate {
                     }.each { it.scope*.value = 'compile'}
                 }
             }
+            repositories {
+                def gitLabApi = System.getenv("CI_API_V4_URL")
+                def gitLabProjectId = System.getenv("CI_PROJECT_ID")
+                def gitLabJobToken = System.getenv("CI_JOB_TOKEN")
+                if (gitLabApi && gitLabProjectId && gitLabJobToken) {
+                    maven {
+                        name = "GitLab"
+                        url = uri("${gitLabApi}/projects/${gitLabProjectId}/packages/maven")
+                        credentials(HttpHeaderCredentials) {
+                            name = "Job-Token"
+                            value = gitLabJobToken
+                        }
+                        authentication {
+                            header(HttpHeaderAuthentication)
+                        }
+                    }
+                }
+            }
         }
 
         doLast {
@@ -57,4 +78,3 @@ project.afterEvaluate {
         }
     }
 }
-

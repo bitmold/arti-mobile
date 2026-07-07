@@ -1,0 +1,132 @@
+stages:
+  - validate
+  - native
+  - test
+  - package
+  - publish
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH'
+
+variables:
+  CARGO_HOME: "$CI_PROJECT_DIR/.cache/cargo"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.cache/gradle"
+  RUSTUP_HOME: "$CI_PROJECT_DIR/.cache/rustup"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2048m"
+
+.rust_cache: &rust_cache
+  key:
+    files:
+      - common/Cargo.lock
+  paths:
+    - .cache/cargo/registry
+    - .cache/cargo/git
+    - .cache/rustup
+    - common/target
+
+.gradle_cache: &gradle_cache
+  key: "gradle-${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .cache/gradle/caches
+    - .cache/gradle/wrapper
+
+.android_job:
+  image: ghcr.io/cirruslabs/android-sdk:35
+  before_script:
+    - export PATH="$CARGO_HOME/bin:$PATH"
+    - chmod +x android/gradlew
+    - java -version
+    - cd android
+
+rust:check:
+  stage: validate
+  image: containers.torproject.org/tpo/tpa/base-images/rust:stable
+  cache: *rust_cache
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends build-essential ca-certificates libsqlite3-dev pkg-config rustup
+    - export PATH="$CARGO_HOME/bin:$PATH"
+    - rustup default stable
+    - rustup component add rustfmt clippy
+  script:
+    - cd common
+    - cargo fmt --check
+    - cargo check --locked
+    - cargo clippy --locked --all-targets
+    - cargo test --locked
+
+android:native:
+  stage: native
+  image: ghcr.io/cirruslabs/android-sdk:35
+  cache: *rust_cache
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends build-essential curl unzip wget ca-certificates
+    - export PATH="$CARGO_HOME/bin:$PATH"
+    - |
+      if ! command -v cargo >/dev/null; then
+        curl --proto '=https' --tlsv1.2 -fsS https://sh.rustup.rs | sh -s -- -y --profile minimal
+      fi
+    - rustup default stable
+    - rustc --version
+  script:
+    - cd common
+    - make android-release
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - android/arti/src/main/jniLibs/
+
+android:test:
+  stage: test
+  extends: .android_job
+  needs:
+    - job: android:native
+      artifacts: true
+  cache: *gradle_cache
+  script:
+    - ./gradlew --no-daemon :arti:testDebugUnitTest :sample:testDebugUnitTest :arti:lintRelease :sample:lintDebug
+  artifacts:
+    when: always
+    expire_in: 1 week
+    reports:
+      junit:
+        - android/**/build/test-results/test*/TEST-*.xml
+    paths:
+      - android/arti/build/reports/
+      - android/sample/build/reports/
+
+android:package:
+  stage: package
+  extends: .android_job
+  needs:
+    - job: android:native
+      artifacts: true
+  cache: *gradle_cache
+  script:
+    - ./gradlew --no-daemon :arti:assembleRelease :sample:assembleDebug
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - android/arti/build/outputs/aar/*.aar
+      - android/sample/build/outputs/apk/debug/*.apk
+
+publish:maven:
+  stage: publish
+  extends: .android_job
+  needs:
+    - job: android:native
+      artifacts: true
+    - job: android:test
+    - job: android:package
+  cache: *gradle_cache
+  script:
+    - ./gradlew --no-daemon :arti:publishLibraryReleasePublicationToGitLabRepository
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+      allow_failure: true
