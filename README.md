@@ -72,3 +72,9 @@ Sample use:
 vagrant up
 vagrant ssh -c "cd /vagrant/common && make android"
 ```
+
+## Release signing
+
+Release publishing is gated by signed Git tags. See
+[docs/release-signing.md](docs/release-signing.md) for the signing workflow and
+CI release checks.
