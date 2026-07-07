@@ -11,7 +11,7 @@ IOS_TARGETS := \
 MACOS_TARGETS := \
 	aarch64-apple-darwin \
 	x86_64-apple-darwin
-FILENAME := libarti_mobile_ex.a
+FILENAME := libarti_mobile.a
 
 export NDK_HOME=${current_dir}cache/ndk/android-ndk-r28c
 export ANDROID_NDK_HOME=${NDK_HOME}

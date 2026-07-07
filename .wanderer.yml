@@ -1,6 +1,6 @@
 places:
 
-  - name: arti-mobile-ex
+  - name: arti-mobile
     image: docker.io/debian:11-slim
     provisions:
       - install-dependencies
@@ -9,7 +9,7 @@ journeys:
 
   - name: install-dependencies
     places:
-      - arti-mobile-ex
+      - arti-mobile
     script:
       - apt update -yyq
       - apt upgrade -yyq
@@ -18,6 +18,6 @@ journeys:
 
   - name: android
     places:
-      - arti-mobile-ex
+      - arti-mobile
     script:
       - cd common && make android

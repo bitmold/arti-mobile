@@ -252,7 +252,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "arti-mobile-ex"
+name = "arti-mobile"
 version = "1.7.0"
 dependencies = [
  "anyhow",
