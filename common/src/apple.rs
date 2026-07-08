@@ -58,4 +58,3 @@ pub extern "C" fn start_arti(
 pub extern "C" fn stop_arti() {
     stop_arti_proxy();
 }
-
