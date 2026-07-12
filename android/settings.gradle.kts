@@ -8,19 +8,23 @@ pluginManagement {
         mavenCentral()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven {
-            url 'https://jitpack.io'
+        maven(uri("https://jitpack.io")) {
             content {
-                includeModule('com.github.tladesignz', 'IPtProxy')
+                includeModule("com.github.tladesignz", "IPtProxy")
             }
         }
     }
 }
+
 rootProject.name = "arti-android"
-include ':sample'
-include ':arti'
+include(":sample", ":arti")

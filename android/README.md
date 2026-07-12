@@ -3,17 +3,21 @@ Android library for Arti with JNI interface
 
 - published as experimental maven dependency at:
 
+```groovy
 repositories {
       maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
 }
+```
 
+```groovy
 dependencies {
     implementation("org.torproject:arti-mobile:1.7.0.1")
 }
-
+```
 
 Sample use:
 
+```java
   	var artiProxy = ArtiProxy.Builder(this)
                 .setLogListener((log) -> {
                     Log.d("artilog", log);
@@ -21,7 +25,7 @@ Sample use:
                 })
                 .setWrapWebView(true)
                 .build();
-        mArtiProxy.start();
+        artiProxy.start();
         var socksPort = mArtiProxy.getSocksPort();
-
+```
 

@@ -3,7 +3,7 @@
     <string name="intro_text">Welcome to the Arti for Android sample project!
                 Through this basic sample app, we will show you how to integrate
                 Arti (Tor in Rust) into your app. Choose how you want to connect below: </string>
-    <string name="performing_request">performing request ...</string>
+    <string name="performing_request">performing request…</string>
     <string name="tor_no_arti">⚠ connected to check.torproject.org without arti</string>
     <string name="tor_with_arti">✅ connected to check.torproject.org using arti</string>
     <string name="connection_failed">"⛔ connecting failed"</string>
@@ -20,6 +20,8 @@
     <string name="add_bridge_line">Add bridge line</string>
     <string name="remove_bridge_line">Remove bridge line</string>
     <string name="syntax_err">At least one of your bridge does not match the expected syntaxt, please try again</string>
+    <string name="no_snowflake_bridge_lines">No snowflake bridge lines!</string>
+    <string name="no_lyrebird_bridgelines">No lyrebird bridgelines!</string>
     <string-array name="connection_options">
         <item>Select Pluggable Transport</item>
         <item>Tor Direct (no PT)</item>

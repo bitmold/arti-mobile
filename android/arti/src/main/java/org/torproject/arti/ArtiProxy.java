@@ -6,6 +6,8 @@ import androidx.webkit.ProxyConfig;
 import androidx.webkit.ProxyController;
 import androidx.webkit.WebViewFeature;
 
+import org.jspecify.annotations.NonNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,12 +56,12 @@ public class ArtiProxy {
         stateDir = builder.stateDir.getAbsolutePath();
         logCallback = builder.logListener;
 
-        if (builder.bridgeLines != null && builder.bridgeLines.size() > 0) {
+        if (builder.bridgeLines != null && !builder.bridgeLines.isEmpty()) {
             StringBuilder allBridgeLines = new StringBuilder();
-            boolean firstline = true;
+            boolean firstLine = true;
             for (String bridgeLine : builder.bridgeLines) {
-                if (firstline) {
-                    firstline = false;
+                if (firstLine) {
+                    firstLine = false;
                 } else {
                     allBridgeLines.append("\n");
                 }
@@ -100,12 +102,12 @@ public class ArtiProxy {
                 bridgeLines,
                 socksPort,
                 dnsPort,
-                logLine -> mainLogListener.log(logLine)
+                mainLogListener
         );
     }
 
     public void stop() {
-        // TODO: this would turn of log output, so uncommenting for now. Should be
+        // TODO: this would turn off log output, so uncommenting for now. Should be
         // refactored so that it's independent of start/stop
         // logListeners.remove(this.logCallback);
         ArtiJNI.stopArtiProxyJNI();
@@ -113,7 +115,7 @@ public class ArtiProxy {
 
     public static ArtiProxyBuilder Builder(Context context) {
         if (context == null) {
-            // fail early and make sure devs get a proper error massage
+            // fail early and make sure devs get a proper error message
             // we might want to add appropriate annotations too
             throw new NullPointerException(
                     "Can not initialize ArtiProxy.Builder(Context context): context must not be null.");
@@ -126,18 +128,22 @@ public class ArtiProxy {
         return socksPort;
     }
 
+    @SuppressWarnings("unused")
     public int getDnsPort() {
         return dnsPort;
     }
 
+    @SuppressWarnings("unused")
     public String getCacheDir() {
         return cacheDir;
     }
 
+    @SuppressWarnings("unused")
     public String getStateDir() {
         return stateDir;
     }
 
+    @SuppressWarnings("unused")
     public ArtiLogListener getLogCallback() {
         return logCallback;
     }
@@ -167,6 +173,7 @@ public class ArtiProxy {
          * Change the local SOCKS5 port Arti will provide for accessing the Tor network.
          * (defaults to 9150)
          */
+        @SuppressWarnings("unused")
         public ArtiProxyBuilder setSocksPort(int socksPort) {
             this.socksPort = socksPort;
             return this;
@@ -174,8 +181,9 @@ public class ArtiProxy {
 
         /**
          * Change the local dns resolver port Arti will provide for retrieving domain
-         * names over the the Tor network. (defaults to 9151)
+         * names over the Tor network. (defaults to 9151)
          */
+        @SuppressWarnings("unused")
         public ArtiProxyBuilder setDnsPort(int dnsPort) {
             this.dnsPort = dnsPort;
             return this;
@@ -205,7 +213,7 @@ public class ArtiProxy {
 
         /**
          * Use this to supply bridge lines e.g. from moat or bridges.torproject.org to Arti.
-         * You also need to to register at least one local pluggable transport client. e.g.
+         * You also need to register at least one local pluggable transport client. e.g.
          * ArtiProxy.Builder.setSnowflakePort(), ArtiProxy.Builder.setObfs4Port()
          */
         public ArtiProxyBuilder setBridgeLines(List<String> bridgeLines) {
@@ -215,9 +223,9 @@ public class ArtiProxy {
 
         /**
          * Change the directory where Arti stores its cached data.
-         *
          * TODO: consider moving this out ouf ArtiProxy to make it independent of Android APIs.
          */
+        @SuppressWarnings("unused")
         public ArtiProxyBuilder setCacheDir(File cacheDir) {
             this.cacheDir = cacheDir;
             return this;
@@ -225,9 +233,9 @@ public class ArtiProxy {
 
         /**
          * Change the directory where Arti stores its persistent data.
-         *
          * TODO: consider moving this out ouf ArtiProxy to make it independent of Android APIs.
          */
+        @SuppressWarnings("unused")
         public ArtiProxyBuilder setStateDir(File stateDir) {
             this.stateDir = stateDir;
             return this;
@@ -235,7 +243,6 @@ public class ArtiProxy {
 
         /**
          * globally configure WebViews in the context of this app to route traffic through this proxy.
-         *
          * TODO: consider moving this out ouf ArtiProxy to make it independent of Android APIs.
          */
         public ArtiProxyBuilder setWrapWebView(boolean wrapWebView) {
@@ -260,7 +267,7 @@ public class ArtiProxy {
         /**
          * Build an ArtiProxy instance.
          */
-        public ArtiProxy build() {
+        public @NonNull ArtiProxy build() {
             if (cacheDir == null) {
                 cacheDir = new File(context.getCacheDir().getAbsolutePath() + "/arti_cache");
             }
@@ -289,13 +296,10 @@ public class ArtiProxy {
      * trace dispatcher". We re-register for a second time it panics. So for supporting multiple
      * log callback consumers, we use this central callback object for multiplexing log events.
      */
-    private static ArtiLogListener mainLogListener = new ArtiLogListener() {
-        @Override
-        public void log(String logLine) {
-            synchronized (logListeners) {
-                for (ArtiLogListener logListener : logListeners) {
-                    logListener.log(logLine);
-                }
+    private static final ArtiLogListener mainLogListener = logLine -> {
+        synchronized (logListeners) {
+            for (ArtiLogListener logListener : logListeners) {
+                logListener.log(logLine);
             }
         }
     };

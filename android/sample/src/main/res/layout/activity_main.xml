@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/constraint_layout"
-    tools:context=".sample.MainActivity">
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/text"
@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
+        android:text="@string/intro_text"
         android:textColor="@color/black"
-        android:text="#undefined"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,15 +25,15 @@
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
         android:layout_marginStart="40dp"
+        android:layout_marginBottom="60dp"
         android:clickable="true"
-        android:contentDescription="start_arti_button"
-        android:focusable="true"
         android:enabled="false"
-        app:layout_constraintStart_toEndOf="@+id/stopButton"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@android:drawable/ic_popup_sync" />
+        app:layout_constraintStart_toEndOf="@+id/stopButton"
+        app:srcCompat="@android:drawable/ic_popup_sync"
+        tools:ignore="ContentDescription" />
 
     <Spinner
         android:id="@+id/spinner"
@@ -56,8 +56,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="15dp"
         android:ems="12"
-        android:visibility="gone"
         android:text="@string/please_select_a_valid_option"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,11 +66,11 @@
 
     <TextView
         android:id="@+id/status"
-        android:textColor="@color/black"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginBottom="30dp"
+        android:textColor="@color/black"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,40 +80,40 @@
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/logLabel"
         android:layout_width="match_parent"
-        android:text="@string/artilog_output"
-        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/artilog_output"
         android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/spinner"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner" />
 
     <ScrollView
         android:id="@+id/logScrollView"
         android:layout_width="match_parent"
-        android:visibility="gone"
         android:layout_height="0dp"
         android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
         android:background="@drawable/border"
-        app:layout_constraintTop_toBottomOf="@id/logLabel"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/floatingActionButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logLabel">
 
         <TextView
             android:id="@+id/logTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@android:color/black"
+            android:background="#EFEFEF"
             android:fontFamily="monospace"
-            android:background="#EFEFEF" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@android:color/black" />
     </ScrollView>
 
     <Button
@@ -124,12 +124,12 @@
         android:layout_marginEnd="44dp"
         android:layout_marginBottom="60dp"
         android:backgroundTint="@color/teal_200"
+        android:enabled="true"
         android:text="@string/start"
         android:textColor="@color/black"
-        android:enabled="true"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/stopButton" />
+        app:layout_constraintEnd_toStartOf="@+id/stopButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/stopButton"
@@ -138,8 +138,8 @@
         android:layout_marginStart="40dp"
         android:layout_marginBottom="60dp"
         android:backgroundTint="@android:color/holo_red_light"
-        android:text="@string/stop"
         android:enabled="true"
+        android:text="@string/stop"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/startButton" />
@@ -147,124 +147,126 @@
     <ScrollView
         android:id="@+id/inputScrollView"
         android:layout_width="match_parent"
-        android:visibility="gone"
         android:layout_height="0dp"
         android:layout_marginStart="5dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="5dp"
-        app:layout_constraintHeight_max="220dp"
-        app:layout_constraintTop_toBottomOf="@id/spinner"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintHeight_max="220dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner">
 
         <LinearLayout
-        android:id="@+id/inputFieldsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp">
-
-        <EditText
-            android:id="@+id/obfs4Port"
+            android:id="@+id/inputFieldsContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:backgroundTint="@color/teal_200"
-            android:ems="10"
-            android:hint="@string/enter_obfs4_port"
-            android:inputType="text"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="0dp">
 
-        <EditText
-            android:id="@+id/frontInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:backgroundTint="@color/teal_200"
-            android:ems="10"
-            android:hint="@string/enter_snowflake_front"
-            android:inputType="text"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <EditText
+                android:id="@+id/obfs4Port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/teal_200"
+                android:ems="10"
+                android:hint="@string/enter_obfs4_port"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <EditText
-            android:id="@+id/targetInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:backgroundTint="@color/teal_200"
-            android:ems="10"
-            android:hint="@string/enter_snowflake_target"
-            android:inputType="text"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <EditText
+                android:id="@+id/frontInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/teal_200"
+                android:ems="10"
+                android:hint="@string/enter_snowflake_front"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <EditText
-            android:id="@+id/stunServerInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:backgroundTint="@color/teal_200"
-            android:ems="10"
-            android:hint="@string/enter_stun_servers"
-            android:inputType="text"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <EditText
+                android:id="@+id/targetInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/teal_200"
+                android:ems="10"
+                android:hint="@string/enter_snowflake_target"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <EditText
-            android:id="@+id/bridgeLineInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:backgroundTint="@color/teal_200"
-            android:ems="10"
-            android:hint="@string/enter_bridge_line"
-            android:inputType="text"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            <EditText
+                android:id="@+id/stunServerInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/teal_200"
+                android:ems="10"
+                android:hint="@string/enter_stun_servers"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/bridgeLineInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/teal_200"
+                android:ems="10"
+                android:hint="@string/enter_bridge_line"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <LinearLayout
-                android:layout_height="0dp"
+                style="?android:attr/buttonBarStyle"
                 android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:weightSum="2"
-                android:orientation="horizontal" >
+                android:orientation="horizontal"
+                android:weightSum="2">
 
                 <Button
                     android:id="@+id/buttonAdd"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="15dp"
                     android:layout_marginStart="15dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="1"
                     android:text="@string/add_bridge_line"
-                    />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
                 <Button
                     android:id="@+id/buttonRemove"
+                    style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="15dp"
                     android:layout_marginStart="15dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginEnd="15dp"
+                    android:layout_weight="1"
                     android:text="@string/remove_bridge_line"
-                    />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
             </LinearLayout>
 
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

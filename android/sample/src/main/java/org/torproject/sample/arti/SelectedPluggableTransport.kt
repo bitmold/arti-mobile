@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: 2023 Michael Pöhn <michael@poehn.at>
 // SPDX-License-Identifier: MIT
+package org.torproject.sample.arti
 
-package org.torproject.sample.arti;
-
-public enum SelectedPluggableTransport {
+enum class SelectedPluggableTransport {
     NO_SELECTION,
     NO_PT,
     OBFS4,

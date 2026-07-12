@@ -1,79 +1,85 @@
-apply plugin: 'maven-publish'
-apply plugin: 'kotlin-android'
+apply plugin: "maven-publish"
 
-import org.gradle.api.credentials.HttpHeaderCredentials
-import org.gradle.authentication.http.HttpHeaderAuthentication
-
-task sourceJar(type: Jar) {
+tasks.register('sourceJar', Jar) {
     from android.sourceSets.main.java.srcDirs
     archiveClassifier.set("sources")
 }
 
-project.afterEvaluate {
-    publishToMavenLocal {
-        def groupId = LIBRARY_GROUP
-        def artifactId = LIBRARY_ARTIFACT_ID
-        def versionName = LIBRARY_VERSION_NAME
-        def debugSuffix = "-debug"
-        def releaseSuffix = ""
-        publishing {
-            publications {
-                LibraryRelease(MavenPublication) {
-		    from components.release
-                    //artifact(sourceJar)
-                    setGroupId groupId
-                    setArtifactId artifactId
-                    version versionName + releaseSuffix
-                }
-                LibraryDebug(MavenPublication) {
-                    from components.debug
-                    //artifact(sourceJar)
-                    setGroupId groupId
-                    setArtifactId artifactId
-                    version versionName + debugSuffix
-                }
+def groupId = LIBRARY_GROUP
+def artifactId = LIBRARY_ARTIFACT_ID
+def versionName = LIBRARY_VERSION_NAME
+def debugSuffix = "-debug"
+def releaseSuffix = ""
+
+def runtimeImplDepNames = []
+def impl = configurations.named("implementation")
+if (impl != null) {
+    runtimeImplDepNames = impl.allDependencies.collect { it.name }.findAll { it != null }.toSet()
+}
+
+def gitLabApi = System.getenv("CI_API_V4_URL")
+def gitLabProjectId = System.getenv("CI_PROJECT_ID")
+def gitLabJobToken = System.getenv("CI_JOB_TOKEN")
+
+afterEvaluate {
+    publishing {
+        publications {
+            LibraryRelease(MavenPublication) {
+                from components.getByName("release")
+                setGroupId(groupId)
+                setArtifactId(artifactId)
+                version versionName + releaseSuffix
+                // artifact(sourceJar)
             }
-            publications.all {
-                pom.withXml {
-                    asNode().dependencies.'*'
-                    .findAll() {
-                        it.scope.text() == 'runtime' &&
-                        project.configurations.implementation.allDependencies.find {
-                            dep -> dep.name == it.artifactId.text()
-                        }
-                    }.each { it.scope*.value = 'compile'}
-                }
+
+            LibraryDebug(MavenPublication) {
+                from components.getByName("debug")
+                setGroupId(groupId)
+                setArtifactId(artifactId)
+                version versionName + debugSuffix
+                // artifact(sourceJar)
             }
-            repositories {
-                def gitLabApi = System.getenv("CI_API_V4_URL")
-                def gitLabProjectId = System.getenv("CI_PROJECT_ID")
-                def gitLabJobToken = System.getenv("CI_JOB_TOKEN")
-                if (gitLabApi && gitLabProjectId && gitLabJobToken) {
-                    maven {
-                        name = "GitLab"
-                        url = uri("${gitLabApi}/projects/${gitLabProjectId}/packages/maven")
-                        credentials(HttpHeaderCredentials) {
-                            name = "Job-Token"
-                            value = gitLabJobToken
-                        }
-                        authentication {
-                            header(HttpHeaderAuthentication)
-                        }
-                    }
+        }
+
+        publications.configureEach {
+            pom.withXml {
+                def node = asNode()
+                def deps = node.dependencies.'*'.findAll { depNode ->
+                    depNode.scope.text() == "runtime" &&
+                            runtimeImplDepNames.contains(depNode.artifactId.text())
+                }
+                deps.each { depNode ->
+                    depNode.scope*.value = "compile"
                 }
             }
         }
 
-        doLast {
-            def prettyPrint = {
-                1.upto(100, { print "=" })
-                println()
+        repositories {
+            if (gitLabApi && gitLabProjectId && gitLabJobToken) {
+                maven {
+                    name = "GitLab"
+                    url = uri("${gitLabApi}/projects/${gitLabProjectId}/packages/maven")
+                    credentials(HttpHeaderCredentials) {
+                        name = "Job-Token"
+                        value = gitLabJobToken
+                    }
+                    authentication {
+                        header(HttpHeaderAuthentication)
+                    }
+                }
             }
+        }
+    }
+
+    tasks.named("publishToMavenLocal") {
+        doLast {
+            def prettyPrint = { 1.upto(100, { print "=" }); println() }
+
             println()
             prettyPrint()
-            println "PUBLICATION FINISHED"
-            println "Artifact RELEASE: " + groupId + ":" + artifactId +  ":" + versionName + releaseSuffix
-            println "Artifact DEBUG: " + groupId + ":" + artifactId +  ":" + versionName + debugSuffix
+            println("PUBLICATION FINISHED")
+            println("Artifact RELEASE: " + groupId + ":" + artifactId + ":" + versionName + releaseSuffix)
+            println("Artifact DEBUG: " + groupId + ":" + artifactId + ":" + versionName + debugSuffix)
             prettyPrint()
         }
     }
