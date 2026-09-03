@@ -1,6 +1,6 @@
 apply plugin: "maven-publish"
 
-tasks.register('sourceJar', Jar) {
+tasks.register("sourceJar", Jar) {
     from android.sourceSets.main.java.srcDirs
     archiveClassifier.set("sources")
 }
@@ -12,7 +12,7 @@ def debugSuffix = "-debug"
 def releaseSuffix = ""
 
 def runtimeImplDepNames = []
-def impl = configurations.named("implementation")
+def impl = configurations.named("implementation").get()
 if (impl != null) {
     runtimeImplDepNames = impl.allDependencies.collect { it.name }.findAll { it != null }.toSet()
 }
