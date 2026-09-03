@@ -18,11 +18,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven(uri("https://jitpack.io")) {
-            content {
-                includeModule("com.github.tladesignz", "IPtProxy")
-            }
-        }
     }
 }
 

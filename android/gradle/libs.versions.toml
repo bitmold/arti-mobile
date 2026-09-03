@@ -2,7 +2,7 @@
 agp = "9.4.0"
 appcompat = "1.7.1"
 constraintlayout = "2.2.1"
-iptproxy = "3.8.2"
+iptproxy = "5.5.1"
 localbroadcastmanager = "1.1.0"
 material = "1.14.0"
 webkit = "1.16.0"

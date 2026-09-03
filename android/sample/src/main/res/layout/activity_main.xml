@@ -165,20 +165,6 @@
             tools:layout_editor_absoluteX="0dp">
 
             <EditText
-                android:id="@+id/obfs4Port"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:backgroundTint="@color/teal_200"
-                android:ems="10"
-                android:hint="@string/enter_obfs4_port"
-                android:inputType="text"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <EditText
                 android:id="@+id/frontInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

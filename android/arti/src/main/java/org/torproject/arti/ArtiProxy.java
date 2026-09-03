@@ -84,7 +84,7 @@ public class ArtiProxy {
             ProxyConfig proxyConfig = new ProxyConfig.Builder()
                     .addProxyRule(proxyHost) // proxy for tor
                     .addDirect().build();
-            ProxyController.getInstance().setProxyOverride(proxyConfig, command -> {
+            ProxyController.getInstance().setProxyOverride(proxyConfig, _ -> {
                 //do nothing
             }, () -> {
 

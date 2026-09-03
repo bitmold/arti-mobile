@@ -142,7 +142,7 @@ fn _configure_and_run_arti_proxy(
         let mut transport = TransportConfigBuilder::default();
         transport
             .protocols(vec!["obfs4".parse().unwrap()])
-            .proxy_addr(SocketAddr::new("127.0.0.1".parse().unwrap(), 47300));
+            .proxy_addr(SocketAddr::new("127.0.0.1".parse().unwrap(), obfs4_port));
         client_config_builder.bridges().transports().push(transport);
     }
 

@@ -139,7 +139,6 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 app.connectWithLyrebird(
-                    binding.obfs4Port.text.toString().toInt(),
                     lyreBirdBridgeLines
                 )
             }
@@ -318,7 +317,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setDirectVisibilities() {
         binding.stunServerInput.visibility = View.GONE
-        binding.obfs4Port.visibility = View.GONE
         binding.targetInput.visibility = View.GONE
         binding.frontInput.visibility = View.GONE
         binding.bridgeLineInput.visibility = View.GONE
@@ -332,7 +330,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setLyrebirdVisibilities() {
         binding.bridgeLineInput.visibility = View.VISIBLE
-        binding.obfs4Port.visibility = View.VISIBLE
         binding.stunServerInput.visibility = View.GONE
         binding.targetInput.visibility = View.GONE
         binding.frontInput.visibility = View.GONE
@@ -351,7 +348,6 @@ class MainActivity : AppCompatActivity() {
         binding.targetInput.visibility = View.VISIBLE
         binding.frontInput.visibility = View.VISIBLE
         binding.noOptionSelected.visibility = View.GONE
-        binding.obfs4Port.visibility = View.GONE
         binding.logLabel.visibility = View.VISIBLE
         binding.inputScrollView.visibility = View.VISIBLE
         binding.buttonAdd.visibility = View.VISIBLE
